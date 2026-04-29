@@ -379,7 +379,7 @@ function Dashboard() {
       const res = await fetch('/api/admin/delete', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ uuid: file.uuid, key: file.key }),
+        body: JSON.stringify({ uuid: file.uuid }),
       });
       if (!res.ok) throw new Error('Nepavyko ištrinti');
       setDeleteConfirm(null);

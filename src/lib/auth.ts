@@ -1,12 +1,14 @@
 import { SignJWT, jwtVerify, type JWTPayload } from 'jose';
 
-const secret = new TextEncoder().encode(
-  process.env.JWT_SECRET ?? 'insecure-dev-secret-change-in-production',
-);
-
 const ISSUER = 'wedding-admin';
 const AUDIENCE = 'wedding-admin';
 const EXPIRY = '24h';
+
+function jwtSecret(): Uint8Array {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) throw new Error('JWT_SECRET not configured');
+  return new TextEncoder().encode(secret);
+}
 
 export async function signAdminToken(): Promise<string> {
   return new SignJWT({ role: 'admin' })
@@ -15,12 +17,12 @@ export async function signAdminToken(): Promise<string> {
     .setIssuer(ISSUER)
     .setAudience(AUDIENCE)
     .setExpirationTime(EXPIRY)
-    .sign(secret);
+    .sign(jwtSecret());
 }
 
 export async function verifyAdminToken(token: string): Promise<JWTPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, secret, {
+    const { payload } = await jwtVerify(token, jwtSecret(), {
       issuer: ISSUER,
       audience: AUDIENCE,
     });
@@ -33,12 +35,17 @@ export async function verifyAdminToken(token: string): Promise<JWTPayload | null
 export function verifyAdminPassword(input: string): boolean {
   const expected = process.env.ADMIN_PASSWORD;
   if (!expected) return false;
-  // Constant-time comparison to prevent timing attacks
-  if (input.length !== expected.length) return false;
+
+  // Constant-time comparison over the full length of both strings.
+  // Pads the shorter string with NUL bytes so the loop always runs to maxLen,
+  // preventing early-exit timing leaks.
+  const maxLen = Math.max(input.length, expected.length);
   let diff = 0;
-  for (let i = 0; i < input.length; i++) {
-    diff |= input.charCodeAt(i) ^ expected.charCodeAt(i);
+  for (let i = 0; i < maxLen; i++) {
+    diff |= (input.charCodeAt(i) || 0) ^ (expected.charCodeAt(i) || 0);
   }
+  // Include length in the comparison: different lengths must fail.
+  diff |= input.length ^ expected.length;
   return diff === 0;
 }
 

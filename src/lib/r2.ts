@@ -8,21 +8,20 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 // ─── Lazy singleton client ────────────────────────────────────────────────────
+
 let _r2: S3Client | null = null;
 
 function client(): S3Client {
   if (_r2) return _r2;
-  const accountId = process.env.R2_ACCOUNT_ID;
   const accessKeyId = process.env.R2_ACCESS_KEY_ID;
   const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
-  if (!accountId || !accessKeyId || !secretAccessKey) {
-    throw new Error(
-      'R2 credentials not configured. Set R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY.',
-    );
+  const endpoint = process.env.R2_ENDPOINT;
+  if (!accessKeyId || !secretAccessKey || !endpoint) {
+    throw new Error('R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY and R2_ENDPOINT must be set.');
   }
   _r2 = new S3Client({
     region: 'auto',
-    endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
+    endpoint,
     credentials: { accessKeyId, secretAccessKey },
   });
   return _r2;
@@ -34,28 +33,59 @@ function bucket(): string {
   return b;
 }
 
-// ─── Allowed types ────────────────────────────────────────────────────────────
-export const ALLOWED_IMAGE_TYPES = new Set([
-  'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
-  'image/heic', 'image/heif', 'image/tiff', 'image/bmp', 'image/raw',
-]);
+// ─── File type validation ─────────────────────────────────────────────────────
+// Map: lowercase file extension → canonical MIME type.
+// This is the single source of truth — both for allow-listing and for
+// cross-validating the client-supplied Content-Type.
 
-export const ALLOWED_VIDEO_TYPES = new Set([
-  'video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-matroska',
-  'video/webm', 'video/mpeg', 'video/3gpp', 'video/3gpp2',
-  'video/x-ms-wmv', 'video/x-flv', 'video/ogg',
-]);
+const EXT_TO_CANONICAL_MIME: Readonly<Record<string, string>> = {
+  // Images
+  jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png',
+  gif: 'image/gif', webp: 'image/webp', heic: 'image/heic',
+  heif: 'image/heif', tiff: 'image/tiff', tif: 'image/tiff',
+  bmp: 'image/bmp',
+  // Videos
+  mp4: 'video/mp4', mov: 'video/quicktime', avi: 'video/x-msvideo',
+  mkv: 'video/x-matroska', webm: 'video/webm', mpg: 'video/mpeg',
+  mpeg: 'video/mpeg', '3gp': 'video/3gpp', '3g2': 'video/3gpp2',
+  wmv: 'video/x-ms-wmv', flv: 'video/x-flv', ogv: 'video/ogg',
+  m4v: 'video/mp4', ts: 'video/mp2t',
+};
+
+// Non-standard but common MIME types browsers sometimes send → canonical form.
+const MIME_NORMALIZE: Readonly<Record<string, string>> = {
+  'image/jpg': 'image/jpeg',
+  'video/x-m4v': 'video/mp4',
+  'video/mp4v-es': 'video/mp4',
+};
+
+/**
+ * Validates a file's extension against the client-provided MIME type.
+ * Returns the canonical MIME type if valid, or null if the file should be rejected.
+ *
+ * Security note: we do NOT trust the client MIME alone. We derive the canonical
+ * MIME from the file extension (server-side whitelist) and then verify the client
+ * MIME normalises to the same value. This prevents extension-MIME spoofing.
+ */
+export function resolveFileType(filename: string, clientMime: string): string | null {
+  const lastDot = filename.lastIndexOf('.');
+  if (lastDot === -1 || lastDot === filename.length - 1) return null; // no extension
+
+  const ext = filename.slice(lastDot + 1).toLowerCase();
+  const canonicalFromExt = EXT_TO_CANONICAL_MIME[ext];
+  if (!canonicalFromExt) return null; // extension not in whitelist
+
+  const normalizedClientMime =
+    MIME_NORMALIZE[clientMime.toLowerCase()] ?? clientMime.toLowerCase();
+
+  // Extension-derived MIME must match normalised client MIME.
+  if (normalizedClientMime !== canonicalFromExt) return null;
+
+  return canonicalFromExt;
+}
 
 export function isAllowedType(contentType: string): boolean {
-  return ALLOWED_IMAGE_TYPES.has(contentType) || ALLOWED_VIDEO_TYPES.has(contentType);
-}
-
-export function isImage(contentType: string): boolean {
-  return ALLOWED_IMAGE_TYPES.has(contentType);
-}
-
-export function isVideo(contentType: string): boolean {
-  return ALLOWED_VIDEO_TYPES.has(contentType);
+  return Object.values(EXT_TO_CANONICAL_MIME).includes(contentType);
 }
 
 export function sanitizeFilename(name: string): string {
@@ -68,22 +98,25 @@ export function sanitizeFilename(name: string): string {
 }
 
 // ─── R2 operations ────────────────────────────────────────────────────────────
+
 export async function getPresignedPutUrl(
   key: string,
   contentType: string,
   expiresIn = 3600,
 ): Promise<string> {
-  const command = new PutObjectCommand({
-    Bucket: bucket(),
-    Key: key,
-    ContentType: contentType,
-  });
-  return getSignedUrl(client(), command, { expiresIn });
+  return getSignedUrl(
+    client(),
+    new PutObjectCommand({ Bucket: bucket(), Key: key, ContentType: contentType }),
+    { expiresIn },
+  );
 }
 
 export async function getPresignedGetUrl(key: string, expiresIn = 3600): Promise<string> {
-  const command = new GetObjectCommand({ Bucket: bucket(), Key: key });
-  return getSignedUrl(client(), command, { expiresIn });
+  return getSignedUrl(
+    client(),
+    new GetObjectCommand({ Bucket: bucket(), Key: key }),
+    { expiresIn },
+  );
 }
 
 export async function putJsonMeta(key: string, data: object): Promise<void> {
@@ -109,6 +142,7 @@ export async function getJsonMeta<T>(key: string): Promise<T | null> {
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
+
 export interface MetaFile {
   uuid: string;
   key: string;
@@ -119,7 +153,8 @@ export interface MetaFile {
   uploadedAt: string;
 }
 
-// ─── Listing & deletion ───────────────────────────────────────────────────────
+// ─── Listing ──────────────────────────────────────────────────────────────────
+
 export async function listMetaFiles(): Promise<MetaFile[]> {
   const all: MetaFile[] = [];
   let continuationToken: string | undefined;
@@ -136,7 +171,6 @@ export async function listMetaFiles(): Promise<MetaFile[]> {
 
     const keys = (res.Contents ?? []).map((o) => o.Key!).filter(Boolean);
 
-    // Fetch meta JSONs in parallel, 20 at a time
     for (let i = 0; i < keys.length; i += 20) {
       const chunk = keys.slice(i, i + 20);
       const results = await Promise.allSettled(chunk.map((k) => getJsonMeta<MetaFile>(k)));
@@ -151,6 +185,8 @@ export async function listMetaFiles(): Promise<MetaFile[]> {
   all.sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime());
   return all;
 }
+
+// ─── Deletion ─────────────────────────────────────────────────────────────────
 
 export async function deleteUpload(uuid: string, fileKey: string): Promise<void> {
   await client().send(
