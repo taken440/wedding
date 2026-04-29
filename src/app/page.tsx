@@ -16,21 +16,21 @@ const MAX_SIZE = 5 * 1024 ** 3;
 
 // ─── Floating particles (static so SSR matches client) ───────────────────────
 const PARTICLES = [
-  { left: '5%',  size: 5, delay: '0s',    duration: '9s',  color: '#C47050' },
-  { left: '12%', size: 3, delay: '1.5s',  duration: '11s', color: '#B89088' },
-  { left: '20%', size: 6, delay: '3s',    duration: '8s',  color: '#C47050' },
-  { left: '28%', size: 4, delay: '0.8s',  duration: '13s', color: '#788060' },
-  { left: '36%', size: 3, delay: '4.5s',  duration: '10s', color: '#B89088' },
-  { left: '45%', size: 5, delay: '2.2s',  duration: '9s',  color: '#C47050' },
-  { left: '53%', size: 4, delay: '6s',    duration: '12s', color: '#788060' },
-  { left: '61%', size: 6, delay: '1s',    duration: '8.5s',color: '#B89088' },
-  { left: '70%', size: 3, delay: '3.7s',  duration: '11s', color: '#C47050' },
-  { left: '78%', size: 5, delay: '5s',    duration: '9.5s',color: '#788060' },
-  { left: '85%', size: 4, delay: '2s',    duration: '10s', color: '#B89088' },
-  { left: '91%', size: 3, delay: '7s',    duration: '8s',  color: '#C47050' },
-  { left: '96%', size: 5, delay: '0.5s',  duration: '12s', color: '#788060' },
-  { left: '15%', size: 4, delay: '8s',    duration: '9s',  color: '#C47050' },
-  { left: '58%', size: 3, delay: '4s',    duration: '11s', color: '#B89088' },
+  { left: '5%',  size: 15, delay: '0s',    duration: '9s',  color: '#C47050' },
+  { left: '12%', size: 9,  delay: '1.5s',  duration: '11s', color: '#B89088' },
+  { left: '20%', size: 18, delay: '3s',    duration: '8s',  color: '#C47050' },
+  { left: '28%', size: 12, delay: '0.8s',  duration: '13s', color: '#788060' },
+  { left: '36%', size: 9,  delay: '4.5s',  duration: '10s', color: '#B89088' },
+  { left: '45%', size: 15, delay: '2.2s',  duration: '9s',  color: '#C47050' },
+  { left: '53%', size: 12, delay: '6s',    duration: '12s', color: '#788060' },
+  { left: '61%', size: 18, delay: '1s',    duration: '8.5s',color: '#B89088' },
+  { left: '70%', size: 9,  delay: '3.7s',  duration: '11s', color: '#C47050' },
+  { left: '78%', size: 15, delay: '5s',    duration: '9.5s',color: '#788060' },
+  { left: '85%', size: 12, delay: '2s',    duration: '10s', color: '#B89088' },
+  { left: '91%', size: 9,  delay: '7s',    duration: '8s',  color: '#C47050' },
+  { left: '96%', size: 15, delay: '0.5s',  duration: '12s', color: '#788060' },
+  { left: '15%', size: 12, delay: '8s',    duration: '9s',  color: '#C47050' },
+  { left: '58%', size: 9,  delay: '4s',    duration: '11s', color: '#B89088' },
 ];
 
 // ─── Translations ─────────────────────────────────────────────────────────────
