@@ -1,134 +1,246 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Lato:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ── Palette ─────────────────────────────────────────────────────────────── */
 :root {
-  --ivory: #fdfaf5;
-  --ivory-dark: #f5edd8;
-  --gold: #c9a87c;
-  --gold-dark: #8b6914;
-  --gold-light: #e8d5b0;
-  --rose: #d4a5a5;
-  --rose-dark: #a67a7a;
-  --brown: #3d2b1f;
+  --cream:      #F5F0EB;
+  --cream-dark: #EDE6DC;
+  --brown:      #3D2E28;
+  --brown-mid:  #8C7468;
+  --terra:      #C47050;
+  --terra-light:#D4907A;
+  --sage:       #788060;
+  --sage-light: #9AA082;
+  --mauve:      #B89088;
+  --border:     rgba(196,112,80,0.18);
 }
 
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 
 body {
-  background-color: var(--ivory);
+  background: var(--cream);
   color: var(--brown);
-  font-family: 'Lato', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
+::selection { background: rgba(196,112,80,0.18); color: var(--brown); }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--cream-dark); }
+::-webkit-scrollbar-thumb { background: var(--terra-light); border-radius: 3px; }
+
+/* ── Typography ──────────────────────────────────────────────────────────── */
+.font-serif    { font-family: 'Playfair Display', Georgia, serif; }
+.font-display  { font-family: 'Cormorant Garamond', Georgia, serif; }
+.font-sans     { font-family: 'Inter', system-ui, sans-serif; }
+
+/* ── Entrance animations ─────────────────────────────────────────────────── */
+@keyframes heroUp {
+  from { opacity: 0; transform: translateY(48px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-::-webkit-scrollbar-track {
-  background: var(--ivory-dark);
+@keyframes heroScale {
+  from { opacity: 0; transform: scale(0.80); }
+  to   { opacity: 1; transform: scale(1); }
 }
-::-webkit-scrollbar-thumb {
-  background: var(--gold);
-  border-radius: 3px;
+@keyframes heroFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
-::-webkit-scrollbar-thumb:hover {
-  background: var(--gold-dark);
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-7px); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Selection */
-::selection {
-  background-color: var(--gold-light);
+.anim-up    { animation: heroUp    0.9s cubic-bezier(0.16,1,0.3,1) both; }
+.anim-scale { animation: heroScale 0.8s cubic-bezier(0.16,1,0.3,1) both; }
+.anim-fade  { animation: heroFade  0.8s ease both; }
+.animate-float { animation: float 3s ease-in-out infinite; }
+.animate-fade-in { animation: fadeIn 0.8s ease both; }
+.animate-slide-up { animation: slideUp 0.6s ease both; }
+
+/* ── Drop zone ───────────────────────────────────────────────────────────── */
+.drop-zone {
+  border: 1.5px dashed var(--terra-light);
+  border-radius: 1rem;
+  transition: all 0.25s ease;
+  background: var(--cream);
+}
+.drop-zone.drag-over {
+  border-color: var(--terra);
+  background: rgba(196,112,80,0.06);
+  transform: scale(1.01);
+}
+
+/* ── Progress bar ────────────────────────────────────────────────────────── */
+.progress-track {
+  height: 3px;
+  background: var(--cream-dark);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--terra-light), var(--terra));
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+.btn-primary {
+  background: var(--terra);
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  padding: 0.85rem 2rem;
+  border-radius: 100px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  display: inline-block;
+}
+.btn-primary:hover  { background: #B86040; }
+.btn-primary:active { transform: scale(0.97); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--terra);
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1.75rem;
+  border-radius: 100px;
+  border: 1.5px solid var(--terra);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-outline:hover { background: var(--terra); color: #fff; }
+
+/* ── Input ───────────────────────────────────────────────────────────────── */
+.input-field {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid rgba(139,116,104,0.25);
+  border-radius: 0.75rem;
+  background: #fff;
   color: var(--brown);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.input-field::placeholder { color: var(--brown-mid); opacity: 0.5; }
+.input-field:focus { border-color: var(--terra-light); }
+
+/* ── Admin compat ────────────────────────────────────────────────────────── */
+.input-gold {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid rgba(139,116,104,0.25);
+  border-radius: 0.75rem;
+  background: #fff;
+  color: var(--brown);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.input-gold::placeholder { color: var(--brown-mid); opacity: 0.5; }
+.input-gold:focus { border-color: var(--terra-light); }
+
+.btn-gold {
+  background: var(--terra);
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  padding: 0.85rem 2rem;
+  border-radius: 100px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-gold:hover { background: #B86040; }
+
+.btn-outline-gold {
+  background: transparent;
+  color: var(--terra);
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 0.85rem;
+  padding: 0.75rem 1.75rem;
+  border-radius: 100px;
+  border: 1.5px solid var(--terra);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-outline-gold:hover { background: var(--terra); color: #fff; }
+
+.btn-danger {
+  background: rgba(220,38,38,0.08);
+  color: #dc2626;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-danger:hover { background: #dc2626; color: #fff; }
+
+.card-elegant {
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(8px);
+  border-radius: 1.25rem;
+  box-shadow: 0 2px 24px rgba(61,46,40,0.08);
+  border: 1px solid rgba(139,116,104,0.12);
 }
 
-/* =========================================
-   TYPOGRAPHY UTILITIES
-   ========================================= */
-.font-serif {
-  font-family: 'Playfair Display', Georgia, serif;
-}
-.font-display {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-}
-.font-sans {
-  font-family: 'Lato', system-ui, sans-serif;
-}
+.hero-bg { background: var(--cream); }
 
-/* =========================================
-   DECORATIVE DIVIDER
-   ========================================= */
 .divider-gold {
   display: flex;
   align-items: center;
   gap: 1rem;
-  color: var(--gold);
+  color: var(--terra);
 }
 .divider-gold::before,
 .divider-gold::after {
   content: '';
   flex: 1;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  background: linear-gradient(90deg, transparent, var(--terra-light), transparent);
 }
 
-/* =========================================
-   DRAG & DROP ZONE
-   ========================================= */
-.drop-zone {
-  border: 2px dashed var(--gold);
-  border-radius: 1rem;
-  transition: all 0.3s ease;
-  background: linear-gradient(135deg, var(--ivory) 0%, var(--ivory-dark) 100%);
-}
-.drop-zone.drag-over {
-  border-color: var(--gold-dark);
-  background: var(--gold-light);
-  transform: scale(1.01);
-}
-
-/* =========================================
-   PROGRESS BAR
-   ========================================= */
-.progress-track {
-  height: 4px;
-  background: var(--ivory-dark);
-  border-radius: 2px;
-  overflow: hidden;
-}
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--gold), var(--gold-dark));
-  border-radius: 2px;
-  transition: width 0.3s ease;
-}
-
-/* =========================================
-   ADMIN GALLERY GRID
-   ========================================= */
 .admin-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 1.25rem;
 }
 
-/* =========================================
-   LIGHTBOX
-   ========================================= */
 .lightbox-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.92);
+  background: rgba(0,0,0,0.92);
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -136,69 +248,18 @@ body {
   animation: fadeIn 0.2s ease;
 }
 
-/* =========================================
-   BUTTON STYLES
-   ========================================= */
-.btn-gold {
-  @apply bg-gold text-wedding-brown font-sans font-bold px-8 py-3 rounded-full
-    transition-all duration-300 hover:bg-gold-dark hover:text-ivory
-    focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2;
+/* ── Grain overlay ───────────────────────────────────────────────────────── */
+.grain {
+  position: relative;
 }
-
-.btn-outline-gold {
-  @apply border-2 border-gold text-gold-dark font-sans font-bold px-6 py-2.5 rounded-full
-    transition-all duration-300 hover:bg-gold hover:text-wedding-brown
-    focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2;
+.grain::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px;
 }
-
-.btn-danger {
-  @apply bg-red-100 text-red-700 font-sans font-semibold px-4 py-2 rounded-lg
-    transition-all duration-200 hover:bg-red-600 hover:text-white
-    focus:outline-none focus:ring-2 focus:ring-red-400;
-}
-
-/* =========================================
-   INPUT STYLES
-   ========================================= */
-.input-gold {
-  @apply w-full px-4 py-3 border border-gold-light rounded-lg bg-ivory
-    font-sans text-wedding-brown placeholder-rose-dark/60
-    focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold
-    transition-all duration-200;
-}
-
-/* =========================================
-   CARD STYLES
-   ========================================= */
-.card-elegant {
-  @apply bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gold-light/50;
-}
-
-/* =========================================
-   HERO SECTION GRADIENTS
-   ========================================= */
-.hero-bg {
-  background:
-    radial-gradient(ellipse at top left, rgba(212, 165, 165, 0.15) 0%, transparent 50%),
-    radial-gradient(ellipse at bottom right, rgba(201, 168, 124, 0.12) 0%, transparent 50%),
-    linear-gradient(180deg, #fdfaf5 0%, #f5edd8 100%);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
-}
-
-.animate-fade-in { animation: fadeIn 0.8s ease both; }
-.animate-slide-up { animation: slideUp 0.6s ease both; }
-.animate-float { animation: float 3s ease-in-out infinite; }
