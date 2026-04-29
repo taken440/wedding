@@ -216,34 +216,34 @@ export default function HomePage() {
         <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
           <div style={{
             position: 'absolute', borderRadius: '50%',
-            width: '70vw', height: '70vw', maxWidth: 600, maxHeight: 600,
-            top: '-20%', left: '-15%',
-            background: 'rgba(196,112,80,0.13)',
-            filter: 'blur(90px)',
+            width: '80vw', height: '80vw', maxWidth: 650, maxHeight: 650,
+            top: '-25%', left: '-20%',
+            background: 'rgba(196,112,80,0.28)',
+            filter: 'blur(60px)',
             animation: 'blob1 14s ease-in-out infinite',
           }} />
           <div style={{
             position: 'absolute', borderRadius: '50%',
-            width: '55vw', height: '55vw', maxWidth: 480, maxHeight: 480,
-            top: '10%', right: '-18%',
-            background: 'rgba(184,144,136,0.11)',
-            filter: 'blur(80px)',
+            width: '65vw', height: '65vw', maxWidth: 520, maxHeight: 520,
+            top: '5%', right: '-20%',
+            background: 'rgba(184,144,136,0.24)',
+            filter: 'blur(55px)',
             animation: 'blob2 18s ease-in-out infinite',
           }} />
           <div style={{
             position: 'absolute', borderRadius: '50%',
-            width: '50vw', height: '50vw', maxWidth: 420, maxHeight: 420,
-            bottom: '-10%', left: '15%',
-            background: 'rgba(120,128,96,0.09)',
-            filter: 'blur(85px)',
+            width: '60vw', height: '60vw', maxWidth: 480, maxHeight: 480,
+            bottom: '-15%', left: '10%',
+            background: 'rgba(120,128,96,0.20)',
+            filter: 'blur(60px)',
             animation: 'blob3 11s ease-in-out infinite',
           }} />
           <div style={{
             position: 'absolute', borderRadius: '50%',
-            width: '40vw', height: '40vw', maxWidth: 360, maxHeight: 360,
-            bottom: '5%', right: '5%',
-            background: 'rgba(196,112,80,0.07)',
-            filter: 'blur(70px)',
+            width: '50vw', height: '50vw', maxWidth: 400, maxHeight: 400,
+            bottom: '0%', right: '0%',
+            background: 'rgba(212,144,122,0.18)',
+            filter: 'blur(50px)',
             animation: 'blob4 16s ease-in-out infinite',
           }} />
         </div>
