@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const BRIDE = process.env.NEXT_PUBLIC_BRIDE_NAME ?? 'Mia';
 const GROOM = process.env.NEXT_PUBLIC_GROOM_NAME ?? 'Jonas';
@@ -13,6 +13,62 @@ const ALLOWED_TYPES = new Set([
   'video/webm','video/mpeg','video/3gpp','video/3gpp2','video/ogg',
 ]);
 const MAX_SIZE = 5 * 1024 ** 3;
+
+// ─── Translations ─────────────────────────────────────────────────────────────
+const T = {
+  lt: {
+    scrollBtn:      'Įkelti nuotraukas',
+    quote:          '„Kiekviena nuotrauka — tai sustabdyta akimirka,\nkuri gyvens amžinai."',
+    uploadSubtitle: 'Jūsų prisiminimai mums brangūs',
+    uploadTitle:    'Dalinkitės nuotraukomis',
+    uploadDesc:     'Kviečiame įkelti nuotraukas ir vaizdo įrašus iš šios\nypatingos dienos — kiekvienas kadras neįkainojamas.',
+    nameLabel:      'Jūsų vardas',
+    nameOptional:   '(neprivaloma)',
+    namePlaceholder:'Pvz., Ona ir Tomas',
+    dropText:       'Paspauskite arba nuvilkite failus',
+    dropHint:       'Nuotraukos ir vaizdo įrašai · iki 5 GB',
+    dropDragging:   'Paleiskite čia',
+    successTitle:   'Ačiū iš širdies!',
+    successOne:     'Jūsų failas sėkmingai įkeltas.',
+    successMany:    (n: number) => `Visi ${n} failai sėkmingai įkelti.`,
+    successSub:     'Jūsų prisiminimai išsaugoti amžiams.',
+    uploadMore:     'Įkelti daugiau',
+    uploading:      'Įkeliama...',
+    uploadBtn:      'Įkelti',
+    errType:        (name: string) => `"${name}" — tik nuotraukos ir vaizdo įrašai.`,
+    errSize:        (name: string) => `"${name}" — per didelis (maks. 5 GB).`,
+    errRetry:       (n: number) => `${n} ${n === 1 ? 'failas' : 'failai'} neįkelti. Bandykite dar kartą.`,
+    statusDone:     'Įkelta ✓',
+    removeLabel:    'Pašalinti',
+  },
+  ru: {
+    scrollBtn:      'Загрузить фото',
+    quote:          '«Каждая фотография — это остановленный миг,\nкоторый будет жить вечно.»',
+    uploadSubtitle: 'Ваши воспоминания дороги нам',
+    uploadTitle:    'Поделитесь фотографиями',
+    uploadDesc:     'Приглашаем загрузить фотографии и видео этого\nособенного дня — каждый кадр бесценен.',
+    nameLabel:      'Ваше имя',
+    nameOptional:   '(необязательно)',
+    namePlaceholder:'Напр., Анна и Томас',
+    dropText:       'Нажмите или перетащите файлы',
+    dropHint:       'Фото и видео · до 5 ГБ',
+    dropDragging:   'Отпустите здесь',
+    successTitle:   'Сердечное спасибо!',
+    successOne:     'Ваш файл успешно загружен.',
+    successMany:    (n: number) => `Все ${n} файла(-ов) успешно загружены.`,
+    successSub:     'Ваши воспоминания сохранены навсегда.',
+    uploadMore:     'Загрузить ещё',
+    uploading:      'Загружается...',
+    uploadBtn:      'Загрузить',
+    errType:        (name: string) => `"${name}" — только фото и видео.`,
+    errSize:        (name: string) => `"${name}" — слишком большой (макс. 5 ГБ).`,
+    errRetry:       (n: number) => `${n} файл(-ов) не загружено. Попробуйте ещё раз.`,
+    statusDone:     'Загружено ✓',
+    removeLabel:    'Удалить',
+  },
+} as const;
+
+type Lang = keyof typeof T;
 
 interface FileEntry {
   id: string;
@@ -42,6 +98,21 @@ async function xhrPut(url: string, file: File, contentType: string, onProgress: 
 }
 
 export default function HomePage() {
+  const [lang, setLang] = useState<Lang>('lt');
+
+  useEffect(() => {
+    const saved = localStorage.getItem('lang') as Lang | null;
+    if (saved === 'lt' || saved === 'ru') setLang(saved);
+  }, []);
+
+  const toggleLang = () => {
+    const next: Lang = lang === 'lt' ? 'ru' : 'lt';
+    setLang(next);
+    localStorage.setItem('lang', next);
+  };
+
+  const t = T[lang];
+
   const [files,       setFiles]       = useState<FileEntry[]>([]);
   const [uploader,    setUploader]    = useState('');
   const [dragging,    setDragging]    = useState(false);
@@ -54,8 +125,8 @@ export default function HomePage() {
     const valid: FileEntry[] = [];
     for (const file of incoming) {
       const type = file.type || 'application/octet-stream';
-      if (!ALLOWED_TYPES.has(type)) { setGlobalError(`"${file.name}" — tik nuotraukos ir vaizdo įrašai.`); return; }
-      if (file.size > MAX_SIZE)     { setGlobalError(`"${file.name}" — per didelis (maks. 5 GB).`);        return; }
+      if (!ALLOWED_TYPES.has(type)) { setGlobalError(t.errType(file.name)); return; }
+      if (file.size > MAX_SIZE)     { setGlobalError(t.errSize(file.name)); return; }
       valid.push({ id: crypto.randomUUID(), file, status: 'pending', progress: 0 });
     }
     setGlobalError('');
@@ -115,6 +186,28 @@ export default function HomePage() {
 
   return (
     <main className="grain min-h-screen" style={{ background: '#F5F0EB' }}>
+
+      {/* ── Language toggle ── */}
+      <button
+        onClick={toggleLang}
+        title={lang === 'lt' ? 'Switch to Russian' : 'Переключить на литовский'}
+        style={{
+          position: 'fixed', top: '1rem', right: '1rem', zIndex: 1000,
+          background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(8px)',
+          border: '1px solid rgba(139,116,104,0.18)',
+          borderRadius: '2rem', padding: '0.35rem 0.75rem',
+          display: 'flex', alignItems: 'center', gap: '0.4rem',
+          cursor: 'pointer', boxShadow: '0 2px 12px rgba(61,46,40,0.08)',
+          transition: 'all 0.2s',
+          fontFamily: 'Inter, sans-serif', fontSize: '0.75rem',
+          color: '#8C7468', fontWeight: 500,
+        }}
+      >
+        <span style={{ fontSize: '1.1rem', lineHeight: 1 }}>
+          {lang === 'lt' ? '🇱🇹' : '🇷🇺'}
+        </span>
+        <span>{lang === 'lt' ? 'LT' : 'RU'}</span>
+      </button>
 
       {/* ══ HERO ══════════════════════════════════════════════════════════════ */}
       <section className="relative flex flex-col items-center justify-center min-h-screen px-6 text-center">
@@ -209,7 +302,7 @@ export default function HomePage() {
             aria-label="Slinkti žemyn"
           >
             <span style={{ fontFamily: 'Inter', fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase' }}>
-              Įkelti nuotraukas
+              {t.scrollBtn}
             </span>
             <svg viewBox="0 0 20 20" fill="none" style={{ width: 18, height: 18 }} aria-hidden>
               <path d="M10 4v12M10 16l-4-4M10 16l4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
@@ -222,7 +315,9 @@ export default function HomePage() {
       <section style={{ background: '#EDE6DC', padding: '4rem 1.5rem 0', textAlign: 'center' }}>
         <div style={{ maxWidth: 520, margin: '0 auto' }}>
           <p className="font-serif" style={{ fontSize: 'clamp(1.1rem, 4vw, 1.5rem)', color: '#8C7468', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.7, marginBottom: '1.25rem' }}>
-            &ldquo;Kiekviena nuotrauka — tai sustabdyta akimirka,<br className="hidden md:block" /> kuri gyvens amžinai.&rdquo;
+            {t.quote.split('\n').map((line, i) => (
+              <span key={i}>{line}{i === 0 && <br />}</span>
+            ))}
           </p>
           <div style={{ width: 32, height: 1, background: '#C47050', margin: '0 auto', opacity: 0.4 }} />
         </div>
@@ -235,13 +330,15 @@ export default function HomePage() {
           {/* heading */}
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <p style={{ fontFamily: 'Inter', fontSize: '0.7rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#B89088', marginBottom: '0.75rem' }}>
-              Jūsų prisiminimai mums brangūs
+              {t.uploadSubtitle}
             </p>
             <h2 className="font-serif" style={{ fontSize: 'clamp(1.75rem, 6vw, 2.5rem)', color: '#3D2E28', fontWeight: 400, marginBottom: '0.75rem' }}>
-              Dalinkitės nuotraukomis
+              {t.uploadTitle}
             </h2>
             <p style={{ fontFamily: 'Inter', fontSize: '0.875rem', color: '#8C7468', lineHeight: 1.7 }}>
-              Kviečiame įkelti nuotraukas ir vaizdo įrašus iš šios<br className="hidden md:block" /> ypatingos dienos — kiekvienas kadras neįkainojamas.
+              {t.uploadDesc.split('\n').map((line, i) => (
+                <span key={i}>{line}{i === 0 && <br className="hidden md:block" />}</span>
+              ))}
             </p>
           </div>
 
@@ -261,28 +358,28 @@ export default function HomePage() {
                   </svg>
                 </div>
                 <h3 className="font-serif" style={{ fontSize: '2rem', color: '#3D2E28', fontWeight: 400, marginBottom: '0.75rem' }}>
-                  Ačiū iš širdies!
+                  {t.successTitle}
                 </h3>
                 <p style={{ fontFamily: 'Inter', fontSize: '0.9rem', color: '#8C7468', lineHeight: 1.7, marginBottom: '0.5rem' }}>
-                  {doneCount === 1 ? 'Jūsų failas sėkmingai įkeltas.' : `Visi ${doneCount} failai sėkmingai įkelti.`}
+                  {doneCount === 1 ? t.successOne : t.successMany(doneCount)}
                 </p>
                 <p style={{ fontFamily: 'Inter', fontSize: '0.875rem', color: '#B89088', fontStyle: 'italic', marginBottom: '2rem' }}>
-                  Jūsų prisiminimai išsaugoti amžiams.
+                  {t.successSub}
                 </p>
-                <button onClick={resetAll} className="btn-outline">Įkelti daugiau</button>
+                <button onClick={resetAll} className="btn-outline">{t.uploadMore}</button>
               </div>
             ) : (
               <>
                 {/* name */}
                 <div style={{ marginBottom: '1.25rem' }}>
                   <label style={{ fontFamily: 'Inter', fontSize: '0.7rem', fontWeight: 500, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#8C7468', display: 'block', marginBottom: '0.5rem' }}>
-                    Jūsų vardas <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(neprivaloma)</span>
+                    {t.nameLabel} <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>{t.nameOptional}</span>
                   </label>
                   <input
                     type="text"
                     value={uploader}
                     onChange={(e) => setUploader(e.target.value)}
-                    placeholder="Pvz., Ona ir Tomas"
+                    placeholder={t.namePlaceholder}
                     className="input-field"
                     maxLength={100}
                     disabled={uploading}
@@ -316,10 +413,10 @@ export default function HomePage() {
                     </svg>
                   </div>
                   <p style={{ fontFamily: 'Inter', fontSize: '0.9rem', color: '#3D2E28', marginBottom: '0.25rem' }}>
-                    {dragging ? 'Paleiskite čia' : 'Paspauskite arba nuvilkite failus'}
+                    {dragging ? t.dropDragging : t.dropText}
                   </p>
                   <p style={{ fontFamily: 'Inter', fontSize: '0.75rem', color: '#B8B0A8' }}>
-                    Nuotraukos ir vaizdo įrašai · iki 5 GB
+                    {t.dropHint}
                   </p>
                   <input ref={inputRef} type="file" multiple accept="image/*,video/*" className="hidden" onChange={onInputChange} />
                 </div>
@@ -366,7 +463,7 @@ export default function HomePage() {
                             </div>
                           )}
                           {entry.status === 'done' && (
-                            <p style={{ fontFamily: 'Inter', fontSize: '0.7rem', color: '#788060', marginTop: 4 }}>Įkelta ✓</p>
+                            <p style={{ fontFamily: 'Inter', fontSize: '0.7rem', color: '#788060', marginTop: 4 }}>{t.statusDone}</p>
                           )}
                           {entry.status === 'error' && (
                             <p style={{ fontFamily: 'Inter', fontSize: '0.7rem', color: '#c0392b', marginTop: 4 }}>{entry.error}</p>
@@ -374,7 +471,7 @@ export default function HomePage() {
                         </div>
 
                         {entry.status === 'pending' && !uploading && (
-                          <button onClick={() => removeFile(entry.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#B8B0A8', flexShrink: 0 }} aria-label="Pašalinti">
+                          <button onClick={() => removeFile(entry.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#B8B0A8', flexShrink: 0 }} aria-label={t.removeLabel}>
                             <svg viewBox="0 0 16 16" fill="none" style={{ width: 16, height: 16 }} aria-hidden>
                               <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                             </svg>
@@ -394,7 +491,7 @@ export default function HomePage() {
                 {errorCount > 0 && !uploading && (
                   <div style={{ marginBottom: '1rem', padding: '0.75rem 1rem', borderRadius: '0.75rem', background: '#fffbeb', border: '1px solid #fde68a' }}>
                     <p style={{ fontFamily: 'Inter', fontSize: '0.8rem', color: '#92400e' }}>
-                      {errorCount} {errorCount === 1 ? 'failas' : 'failai'} neįkelti. Bandykite dar kartą.
+                      {t.errRetry(errorCount)}
                     </p>
                   </div>
                 )}
@@ -412,10 +509,10 @@ export default function HomePage() {
                         <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" style={{ opacity: 0.25 }} />
                         <path fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" style={{ opacity: 0.75 }} />
                       </svg>
-                      Įkeliama...
+                      {t.uploading}
                     </span>
                   ) : (
-                    <>Įkelti{pendingCount > 0 && <span style={{ opacity: 0.7, marginLeft: 6 }}>({pendingCount})</span>}</>
+                    <>{t.uploadBtn}{pendingCount > 0 && <span style={{ opacity: 0.7, marginLeft: 6 }}>({pendingCount})</span>}</>
                   )}
                 </button>
               </>
