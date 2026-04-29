@@ -14,6 +14,25 @@ const ALLOWED_TYPES = new Set([
 ]);
 const MAX_SIZE = 5 * 1024 ** 3;
 
+// ─── Floating particles (static so SSR matches client) ───────────────────────
+const PARTICLES = [
+  { left: '5%',  size: 5, delay: '0s',    duration: '9s',  color: '#C47050' },
+  { left: '12%', size: 3, delay: '1.5s',  duration: '11s', color: '#B89088' },
+  { left: '20%', size: 6, delay: '3s',    duration: '8s',  color: '#C47050' },
+  { left: '28%', size: 4, delay: '0.8s',  duration: '13s', color: '#788060' },
+  { left: '36%', size: 3, delay: '4.5s',  duration: '10s', color: '#B89088' },
+  { left: '45%', size: 5, delay: '2.2s',  duration: '9s',  color: '#C47050' },
+  { left: '53%', size: 4, delay: '6s',    duration: '12s', color: '#788060' },
+  { left: '61%', size: 6, delay: '1s',    duration: '8.5s',color: '#B89088' },
+  { left: '70%', size: 3, delay: '3.7s',  duration: '11s', color: '#C47050' },
+  { left: '78%', size: 5, delay: '5s',    duration: '9.5s',color: '#788060' },
+  { left: '85%', size: 4, delay: '2s',    duration: '10s', color: '#B89088' },
+  { left: '91%', size: 3, delay: '7s',    duration: '8s',  color: '#C47050' },
+  { left: '96%', size: 5, delay: '0.5s',  duration: '12s', color: '#788060' },
+  { left: '15%', size: 4, delay: '8s',    duration: '9s',  color: '#C47050' },
+  { left: '58%', size: 3, delay: '4s',    duration: '11s', color: '#B89088' },
+];
+
 // ─── Translations ─────────────────────────────────────────────────────────────
 const T = {
   lt: {
@@ -212,40 +231,22 @@ export default function HomePage() {
       {/* ══ HERO ══════════════════════════════════════════════════════════════ */}
       <section className="relative flex flex-col items-center justify-center min-h-screen px-6 text-center">
 
-        {/* aurora blobs */}
+        {/* floating particles */}
         <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
-          <div style={{
-            position: 'absolute', borderRadius: '50%',
-            width: '80vw', height: '80vw', maxWidth: 650, maxHeight: 650,
-            top: '-25%', left: '-20%',
-            background: 'rgba(196,112,80,0.28)',
-            filter: 'blur(60px)',
-            animation: 'blob1 14s ease-in-out infinite',
-          }} />
-          <div style={{
-            position: 'absolute', borderRadius: '50%',
-            width: '65vw', height: '65vw', maxWidth: 520, maxHeight: 520,
-            top: '5%', right: '-20%',
-            background: 'rgba(184,144,136,0.24)',
-            filter: 'blur(55px)',
-            animation: 'blob2 18s ease-in-out infinite',
-          }} />
-          <div style={{
-            position: 'absolute', borderRadius: '50%',
-            width: '60vw', height: '60vw', maxWidth: 480, maxHeight: 480,
-            bottom: '-15%', left: '10%',
-            background: 'rgba(120,128,96,0.20)',
-            filter: 'blur(60px)',
-            animation: 'blob3 11s ease-in-out infinite',
-          }} />
-          <div style={{
-            position: 'absolute', borderRadius: '50%',
-            width: '50vw', height: '50vw', maxWidth: 400, maxHeight: 400,
-            bottom: '0%', right: '0%',
-            background: 'rgba(212,144,122,0.18)',
-            filter: 'blur(50px)',
-            animation: 'blob4 16s ease-in-out infinite',
-          }} />
+          {PARTICLES.map((p, i) => (
+            <div key={i} style={{
+              position: 'absolute',
+              bottom: '-10px',
+              left: p.left,
+              width: p.size,
+              height: p.size,
+              borderRadius: '50%',
+              background: p.color,
+              opacity: 0,
+              animation: `particleRise ${p.duration} ease-in infinite`,
+              animationDelay: p.delay,
+            }} />
+          ))}
         </div>
 
         <div className="relative z-10 flex flex-col items-center">
