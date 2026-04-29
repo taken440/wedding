@@ -212,11 +212,41 @@ export default function HomePage() {
       {/* ══ HERO ══════════════════════════════════════════════════════════════ */}
       <section className="relative flex flex-col items-center justify-center min-h-screen px-6 text-center">
 
-        {/* subtle radial glow */}
-        <div style={{
-          position: 'absolute', inset: 0, pointerEvents: 'none',
-          background: 'radial-gradient(ellipse 70% 60% at 50% 45%, rgba(196,112,80,0.08) 0%, transparent 70%)',
-        }} />
+        {/* aurora blobs */}
+        <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+          <div style={{
+            position: 'absolute', borderRadius: '50%',
+            width: '70vw', height: '70vw', maxWidth: 600, maxHeight: 600,
+            top: '-20%', left: '-15%',
+            background: 'rgba(196,112,80,0.13)',
+            filter: 'blur(90px)',
+            animation: 'blob1 14s ease-in-out infinite',
+          }} />
+          <div style={{
+            position: 'absolute', borderRadius: '50%',
+            width: '55vw', height: '55vw', maxWidth: 480, maxHeight: 480,
+            top: '10%', right: '-18%',
+            background: 'rgba(184,144,136,0.11)',
+            filter: 'blur(80px)',
+            animation: 'blob2 18s ease-in-out infinite',
+          }} />
+          <div style={{
+            position: 'absolute', borderRadius: '50%',
+            width: '50vw', height: '50vw', maxWidth: 420, maxHeight: 420,
+            bottom: '-10%', left: '15%',
+            background: 'rgba(120,128,96,0.09)',
+            filter: 'blur(85px)',
+            animation: 'blob3 11s ease-in-out infinite',
+          }} />
+          <div style={{
+            position: 'absolute', borderRadius: '50%',
+            width: '40vw', height: '40vw', maxWidth: 360, maxHeight: 360,
+            bottom: '5%', right: '5%',
+            background: 'rgba(196,112,80,0.07)',
+            filter: 'blur(70px)',
+            animation: 'blob4 16s ease-in-out infinite',
+          }} />
+        </div>
 
         <div className="relative z-10 flex flex-col items-center">
           {/* Bride */}

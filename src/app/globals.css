@@ -72,6 +72,26 @@ body {
 .animate-fade-in { animation: fadeIn 0.8s ease both; }
 .animate-slide-up { animation: slideUp 0.6s ease both; }
 
+@keyframes blob1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(40px, -30px) scale(1.06); }
+  66%       { transform: translate(-25px, 15px) scale(0.96); }
+}
+@keyframes blob2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  40%       { transform: translate(-35px, 20px) scale(1.04); }
+  70%       { transform: translate(20px, -15px) scale(1.08); }
+}
+@keyframes blob3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%       { transform: translate(25px, -20px) scale(1.05); }
+}
+@keyframes blob4 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  45%       { transform: translate(-20px, 30px) scale(0.94); }
+  80%       { transform: translate(15px, -10px) scale(1.04); }
+}
+
 /* ── Drop zone ───────────────────────────────────────────────────────────── */
 .drop-zone {
   border: 1.5px dashed var(--terra-light);
