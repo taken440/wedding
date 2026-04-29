@@ -218,17 +218,30 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ══ QUOTE STRIP ══════════════════════════════════════════════════════ */}
+      <section style={{ background: '#EDE6DC', padding: '4rem 1.5rem 0', textAlign: 'center' }}>
+        <div style={{ maxWidth: 520, margin: '0 auto' }}>
+          <p className="font-serif" style={{ fontSize: 'clamp(1.1rem, 4vw, 1.5rem)', color: '#8C7468', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.7, marginBottom: '1.25rem' }}>
+            &ldquo;Kiekviena nuotrauka — tai sustabdyta akimirka,<br className="hidden md:block" /> kuri gyvens amžinai.&rdquo;
+          </p>
+          <div style={{ width: 32, height: 1, background: '#C47050', margin: '0 auto', opacity: 0.4 }} />
+        </div>
+      </section>
+
       {/* ══ UPLOAD ════════════════════════════════════════════════════════════ */}
-      <section id="upload" style={{ background: '#EDE6DC', padding: '5rem 1rem' }}>
+      <section id="upload" style={{ background: '#EDE6DC', padding: '3.5rem 1rem 5rem' }}>
         <div style={{ maxWidth: 480, margin: '0 auto' }}>
 
           {/* heading */}
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+            <p style={{ fontFamily: 'Inter', fontSize: '0.7rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#B89088', marginBottom: '0.75rem' }}>
+              Jūsų prisiminimai mums brangūs
+            </p>
             <h2 className="font-serif" style={{ fontSize: 'clamp(1.75rem, 6vw, 2.5rem)', color: '#3D2E28', fontWeight: 400, marginBottom: '0.75rem' }}>
               Dalinkitės nuotraukomis
             </h2>
-            <p style={{ fontFamily: 'Inter', fontSize: '0.875rem', color: '#8C7468', lineHeight: 1.6 }}>
-              Įkelkite nuotraukas ir vaizdo įrašus iš šios ypatingos dienos.
+            <p style={{ fontFamily: 'Inter', fontSize: '0.875rem', color: '#8C7468', lineHeight: 1.7 }}>
+              Kviečiame įkelti nuotraukas ir vaizdo įrašus iš šios<br className="hidden md:block" /> ypatingos dienos — kiekvienas kadras neįkainojamas.
             </p>
           </div>
 
@@ -247,11 +260,14 @@ export default function HomePage() {
                     <path d="M5 13l4 4L19 7" stroke="#788060" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </div>
-                <h3 className="font-serif" style={{ fontSize: '1.75rem', color: '#3D2E28', fontWeight: 400, marginBottom: '0.5rem' }}>
-                  Ačiū!
+                <h3 className="font-serif" style={{ fontSize: '2rem', color: '#3D2E28', fontWeight: 400, marginBottom: '0.75rem' }}>
+                  Ačiū iš širdies!
                 </h3>
-                <p style={{ fontFamily: 'Inter', fontSize: '0.875rem', color: '#8C7468', marginBottom: '2rem' }}>
-                  {doneCount === 1 ? 'Failas sėkmingai įkeltas.' : `${doneCount} failai sėkmingai įkelti.`}
+                <p style={{ fontFamily: 'Inter', fontSize: '0.9rem', color: '#8C7468', lineHeight: 1.7, marginBottom: '0.5rem' }}>
+                  {doneCount === 1 ? 'Jūsų failas sėkmingai įkeltas.' : `Visi ${doneCount} failai sėkmingai įkelti.`}
+                </p>
+                <p style={{ fontFamily: 'Inter', fontSize: '0.875rem', color: '#B89088', fontStyle: 'italic', marginBottom: '2rem' }}>
+                  Jūsų prisiminimai išsaugoti amžiams.
                 </p>
                 <button onClick={resetAll} className="btn-outline">Įkelti daugiau</button>
               </div>
