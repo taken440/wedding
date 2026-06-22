@@ -72,7 +72,7 @@ const STORAGE_KEY = 'storage:total_bytes';
 
 // Default cap: 50 GB. Override with MAX_STORAGE_BYTES env var.
 function getStorageCap(): number {
-  return parseInt(process.env.MAX_STORAGE_BYTES ?? String(50 * 1024 ** 3), 10);
+  return parseInt(process.env.MAX_STORAGE_BYTES ?? String(2 * 1024 ** 4), 10);
 }
 
 export async function checkStorageCap(additionalBytes: number): Promise<boolean> {
