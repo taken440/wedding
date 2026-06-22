@@ -28,7 +28,7 @@ function getPresignLimiter(): Ratelimit | null {
   if (!redis) return null;
   _presignLimiter = new Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(30, '1 m'),
+    limiter: Ratelimit.slidingWindow(300, '1 m'),
     prefix: 'rl:presign',
     ephemeralCache: new Map(), // process-local L1 cache to cut Redis round-trips
   });
