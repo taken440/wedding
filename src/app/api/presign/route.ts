@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 import { getPresignedPutUrl, resolveFileType, sanitizeFilename } from '@/lib/r2';
-import { checkPresignRateLimit } from '@/lib/ratelimit';
+import { checkPresignRateLimit, checkStorageCap } from '@/lib/ratelimit';
 import type { PresignRequest, PresignResponse } from '@/types';
 
 const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE_BYTES ?? '5368709120', 10); // 5 GB
@@ -69,6 +69,15 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { error: `Failas per didelis. Maksimalus dydis: ${maxGb} GB.` },
       { status: 413 },
+    );
+  }
+
+  // ── Storage cap ───────────────────────────────────────────────────────────
+  const withinCap = await checkStorageCap(size);
+  if (!withinCap) {
+    return NextResponse.json(
+      { error: 'Saugykla pilna. Susisiekite su organizatoriais.' },
+      { status: 507 },
     );
   }
 

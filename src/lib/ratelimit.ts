@@ -66,6 +66,28 @@ function inMemoryCheck(key: string, max: number, windowMs: number): RateLimitRes
   return { allowed: true, retryAfterSeconds: 0 };
 }
 
+// ─── Storage cap ─────────────────────────────────────────────────────────────
+
+const STORAGE_KEY = 'storage:total_bytes';
+
+// Default cap: 50 GB. Override with MAX_STORAGE_BYTES env var.
+function getStorageCap(): number {
+  return parseInt(process.env.MAX_STORAGE_BYTES ?? String(50 * 1024 ** 3), 10);
+}
+
+export async function checkStorageCap(additionalBytes: number): Promise<boolean> {
+  const redis = getRedis();
+  if (!redis) return true;
+  const current = parseInt((await redis.get<string>(STORAGE_KEY)) ?? '0', 10);
+  return current + additionalBytes <= getStorageCap();
+}
+
+export async function incrementStorage(bytes: number): Promise<void> {
+  const redis = getRedis();
+  if (!redis) return;
+  await redis.incrby(STORAGE_KEY, bytes);
+}
+
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 export async function checkPresignRateLimit(ip: string): Promise<RateLimitResult> {

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { putJsonMeta, resolveFileType } from '@/lib/r2';
+import { incrementStorage } from '@/lib/ratelimit';
 import type { MetaFile } from '@/lib/r2';
 import type { ConfirmRequest } from '@/types';
 
@@ -49,6 +50,7 @@ export async function POST(request: Request) {
 
   try {
     await putJsonMeta(`meta/${uuid}.json`, meta);
+    await incrementStorage(size);
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error('[confirm] R2 error:', err);
